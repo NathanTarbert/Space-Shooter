@@ -1,5 +1,6 @@
 const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext('2d');
+const c = canvas.getContext('2d');
+// console.log(canvas);
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
@@ -12,22 +13,15 @@ class Player {
     }
     
     draw() {
-        ctx.beginPath();
-        ctx.arc(
-            this.x, //x coordinate
-            this.y, //y coordinate
-            this.radius, 
-            0, 
-            Math.PI * 2, //this will get us a full circle
-            false        
-        );
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);      
+        c.fillStyle = this.color;
+        c.fill();
     }
 }
 
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 
-const player = new Player(100, 100, 30, 'black');
+const player = new Player(x, y, 30, 'black');
 player.draw();
