@@ -120,4 +120,4 @@ addEventListener('click', (event) => {
 }); 
 
 animate();
-spawnEnemies();
+// spawnEnemies();
