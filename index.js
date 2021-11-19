@@ -96,12 +96,13 @@ const y = canvas.height / 2;
 const player = new Player(x, y, 30, 'blue');
 
 
-const projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', { x: 1, y: 1}); 
+const projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', { x: 1, y: 1}); //create a new projectile instance
 const projectiles = [];//we will hold all of our projectiles
 const enemies = [];//we will hold all of our enemies
 
+let animationId;
 function animate() {
-    requestAnimationFrame(animate);
+   animationId = requestAnimationFrame(animate);//setting the requestAnimationFrame to our variable, we cancel it when an enemy collides with our player and
     c.clearRect(0, 0, canvas.width, canvas.height); //this will clear the screen so only one projectile moves across the screen instead of a straingh line.
     player.draw();
     projectiles.forEach((projectile) => {
@@ -109,16 +110,20 @@ function animate() {
     });
     enemies.forEach((enemy, index) => { 
         enemy.update();
+        const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);//this will check the distance between the player and the enemy
+        //end game
+        if(dist - enemy.radius - player.radius < 1) {
+            cancelAnimationFrame(animationId);// this will cancel the requestAnimationFrame if we meet our condition
+        }
 
         projectiles.forEach((projectile, projectileIndex) => {
             const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);// this will give us the distance for our projectile and enemy
-            setTimeout(() => {
+            setTimeout(() => {//with our conditional inside the setTimeout it will wait until the next fram to remove the enemy to avoid any flash when there is a collision
                 if(dist - enemy.radius - projectile.radius < 1) {//objects collided
-                enemies.splice(index, 1);
-                projectiles.splice(projectileIndex, 1);
+                enemies.splice(index, 1);//this will look for the specific enemy in the enemies array and remove it by its index #
+                projectiles.splice(projectileIndex, 1);//this will look for our projectile in the projectiles array and remove it according to its index #
                 }
-            }, 0);
-            
+            }, 0);            
         });
     });
 }
