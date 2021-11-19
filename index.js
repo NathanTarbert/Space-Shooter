@@ -107,8 +107,19 @@ function animate() {
     projectiles.forEach((projectile) => {
         projectile.update();        
     });
-    enemies.forEach(enemy => { 
+    enemies.forEach((enemy, index) => { 
         enemy.update();
+
+        projectiles.forEach((projectile, projectileIndex) => {
+            const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);// this will give us the distance for our projectile and enemy
+            setTimeout(() => {
+                if(dist - enemy.radius - projectile.radius < 1) {//objects collided
+                enemies.splice(index, 1);
+                projectiles.splice(projectileIndex, 1);
+                }
+            }, 0);
+            
+        });
     });
 }
 
@@ -120,4 +131,4 @@ addEventListener('click', (event) => {
 }); 
 
 animate();
-spawnEnemies();
+// spawnEnemies();
