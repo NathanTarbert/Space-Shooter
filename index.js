@@ -102,7 +102,7 @@ const enemies = [];//we will hold all of our enemies
 let animationId;
 function animate() {
    animationId = requestAnimationFrame(animate);//setting the requestAnimationFrame to our variable, we cancel it when an enemy collides with our player and
-    c.fillStyle = 'rgb(0, 0, 0, 0.1)';
+    c.fillStyle = 'rgb(0, 0, 0, 0.1)';//sets the color of our background
     c.fillRect(0, 0, canvas.width, canvas.height); //this handles the screen canvas color
     player.draw();
     projectiles.forEach((projectile, index) => {//if projectile goes off the screen
@@ -113,7 +113,7 @@ function animate() {
             projectile.y + projectile.radius < 0 ||//this will cover the top and bottom sides of the screen
             projectile.y - projectile.radius > canvas.height) {
             setTimeout(() => {//with our conditional inside the setTimeout it will wait until the next fram to remove the enemy to avoid any flash when there is a collision
-                projectiles.splice(index);//this will look for our projectile in the projectiles array and remove it according to its index #                
+                projectiles.slice(index);//this will look for our projectile in the projectiles array and remove it according to its index #                
             }, 0);  
         }                 
     });
@@ -127,12 +127,23 @@ function animate() {
 
         projectiles.forEach((projectile, projectileIndex) => {
             const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);// this will give us the distance for our projectile and enemy
-            setTimeout(() => {//with our conditional inside the setTimeout it will wait until the next fram to remove the enemy to avoid any flash when there is a collision
+
+                //when projectiles touch enemy
                 if(dist - enemy.radius - projectile.radius < 1) {//objects collided
-                enemies.splice(index, 1);//this will look for the specific enemy in the enemies array and remove it by its index #
-                projectiles.splice(projectileIndex, 1);//this will look for our projectile in the projectiles array and remove it according to its index #
-                }
-            }, 0);            
+                    if(enemy.radius - 10 > 5) {
+                        gsap.to(enemy, { //this will acces our gsap library cdn imported in the html file
+                            radius: enemy.radius - 10
+                        });
+                        setTimeout(() => {//with our conditional inside the setTimeout it will wait until the next fram to remove the enemy to avoid any flash when there is a collision
+                        projectiles.splice(projectileIndex, 1);//this will look for our projectile in the projectiles array and remove it according to its index #                
+                        }, 0);    
+                    } else {
+                    setTimeout(() => {//with our conditional inside the setTimeout it will wait until the next fram to remove the enemy to avoid any flash when there is a collision
+                        enemies.splice(index, 1);//this will look for the specific enemy in the enemies array and remove it by its index #
+                        projectiles.splice(projectileIndex, 1);//this will look for our projectile in the projectiles array and remove it according to its index #                
+                        }, 0);
+                    }                     
+                }           
         });
     });
 }
@@ -146,4 +157,4 @@ addEventListener('click', (event) => {
 }); 
 
 animate();
-// spawnEnemies();
+spawnEnemies();
