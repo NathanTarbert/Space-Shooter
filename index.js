@@ -65,6 +65,37 @@ class Enemy {
     }
 }
 
+const friction = 0.98;
+class Particle {
+    constructor(x, y, radius, color, velocity) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = velocity;
+        this.alpha = 1;//this is the value that will fade out our particle once an enemy is hit
+    }
+
+    draw() {
+        c.save();
+        c.globalAlpha = this.alpha;
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);      
+        c.fillStyle = this.color;
+        c.fill();
+        c.restore();
+    }
+
+    update() {
+        this.draw();
+        this.velocity.x *= friction; //This will slow down the particles after hit
+        this.velocity.y *= friction;
+        this.x = this.x + this.velocity.x;
+        this.y = this.y + this.velocity.y;
+        this.alpha -= 0.01;
+    }
+}
+
 function spawnEnemies() {
     setInterval(() => {
         const radius = Math.random() * (30 - 4) + 4;// this will make sure the enemy size is only between 4-30 pixels generated randomly
@@ -98,6 +129,7 @@ const player = new Player(x, y, 10, 'white');
 const projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', { x: 1, y: 1}); //create a new projectile instance
 const projectiles = [];//we will hold all of our projectiles
 const enemies = [];//we will hold all of our enemies
+const particles = [];//we will hold all of our particles
 
 let animationId;
 function animate() {
@@ -105,6 +137,14 @@ function animate() {
     c.fillStyle = 'rgb(0, 0, 0, 0.1)';//sets the color of our background
     c.fillRect(0, 0, canvas.width, canvas.height); //this handles the screen canvas color
     player.draw();
+    particles.forEach((particle, index) => {
+        if(particle.alpha <= 0) {
+            particles.splice(index, 1);
+        } else {
+        particle.update();
+        }
+    });
+
     projectiles.forEach((projectile, index) => {//if projectile goes off the screen
         projectile.update(); 
         //remove from edges of the screen
@@ -130,7 +170,22 @@ function animate() {
 
                 //when projectiles touch enemy
                 if(dist - enemy.radius - projectile.radius < 1) {//objects collided
-                    if(enemy.radius - 10 > 5) {
+                    
+                    //create explosions
+                    for(let i = 0; i < enemy.radius * 2; i++) {
+                            particles.push(new Particle(projectile.x, 
+                                projectile.y,
+                                Math.random() * 2, //randomising the size of the particles
+                                enemy.color, 
+                                {
+                                x: (Math.random() - 0.5) * Math.random() * 6,//this will result in a random number either positive or negative by subtracting 0.5 from a positive number
+                                y: (Math.random() - 0.5) * Math.random() * 6
+                                }
+                            )
+                        );
+                    }
+
+                    if(enemy.radius - 10 > 5) {                        
                         gsap.to(enemy, { //this will acces our gsap library cdn imported in the html file
                             radius: enemy.radius - 10
                         });
@@ -157,4 +212,4 @@ addEventListener('click', (event) => {
 }); 
 
 animate();
-spawnEnemies();
+// spawnEnemies();
