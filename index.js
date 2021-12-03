@@ -4,6 +4,8 @@ const c = canvas.getContext('2d');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
+const scoreEl = document.querySelector('#scoreEl');//this is the span with the id that shows our score
+
 class Player {
     constructor(x, y, radius, color) {
         this.x = x;
@@ -132,6 +134,7 @@ const enemies = [];//we will hold all of our enemies
 const particles = [];//we will hold all of our particles
 
 let animationId;
+let score = 0;
 function animate() {
    animationId = requestAnimationFrame(animate);//setting the requestAnimationFrame to our variable, we cancel it when an enemy collides with our player and
     c.fillStyle = 'rgb(0, 0, 0, 0.1)';//sets the color of our background
@@ -170,6 +173,8 @@ function animate() {
 
                 //when projectiles touch enemy
                 if(dist - enemy.radius - projectile.radius < 1) {//objects collided
+
+                    
                     
                     //create explosions
                     for(let i = 0; i < enemy.radius * 2; i++) {
@@ -185,7 +190,12 @@ function animate() {
                         );
                     }
 
-                    if(enemy.radius - 10 > 5) {                        
+                    if(enemy.radius - 10 > 5) {  
+                        
+                        //increase our score
+                        score += 100;
+                        scoreEl.innerHTML = score;//set the score
+
                         gsap.to(enemy, { //this will acces our gsap library cdn imported in the html file
                             radius: enemy.radius - 10
                         });
@@ -193,6 +203,9 @@ function animate() {
                         projectiles.splice(projectileIndex, 1);//this will look for our projectile in the projectiles array and remove it according to its index #                
                         }, 0);    
                     } else {
+                        //remove the enemy from the board
+                        score += 250;
+                        scoreEl.innerHTML = score;//set the score
                     setTimeout(() => {//with our conditional inside the setTimeout it will wait until the next fram to remove the enemy to avoid any flash when there is a collision
                         enemies.splice(index, 1);//this will look for the specific enemy in the enemies array and remove it by its index #
                         projectiles.splice(projectileIndex, 1);//this will look for our projectile in the projectiles array and remove it according to its index #                
