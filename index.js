@@ -1,10 +1,13 @@
 const canvas = document.querySelector('canvas');
-const c = canvas.getContext('2d');
+const c = canvas.getContext('2d');  
 // console.log(canvas);
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 const scoreEl = document.querySelector('#scoreEl');//this is the span with the id that shows our score
+const startGameBtn = document.querySelector('#startGameBtn');
+const modalEl = document.querySelector('#modalEl');
+const bigScoreEl = document.querySelector('#bigScoreEl');
 
 class Player {
     constructor(x, y, radius, color) {
@@ -128,13 +131,24 @@ const y = canvas.height / 2;
 const player = new Player(x, y, 10, 'white');
 
 
-const projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', { x: 1, y: 1}); //create a new projectile instance
-const projectiles = [];//we will hold all of our projectiles
-const enemies = [];//we will hold all of our enemies
-const particles = [];//we will hold all of our particles
+let projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', { x: 1, y: 1}); //create a new projectile instance
+let projectiles = [];//we will hold all of our projectiles
+let enemies = [];//we will hold all of our enemies
+let particles = [];//we will hold all of our particles
+
+function init() {//this function reinitializes our game so once a game ends we reset all values
+    projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', { x: 1, y: 1});
+    projectiles = [];
+    enemies = [];
+    particles = [];
+    score = 0;
+    scoreEl.innerHTML = score;
+    bigScoreEl.innerHTML = score;
+}
 
 let animationId;
 let score = 0;
+let frames = 0;
 function animate() {
    animationId = requestAnimationFrame(animate);//setting the requestAnimationFrame to our variable, we cancel it when an enemy collides with our player and
     c.fillStyle = 'rgb(0, 0, 0, 0.1)';//sets the color of our background
@@ -166,6 +180,8 @@ function animate() {
         //end game
         if(dist - enemy.radius - player.radius < 1) {
             cancelAnimationFrame(animationId);// this will cancel the requestAnimationFrame if we meet our condition
+            modalEl.style.display = 'flex';//this will show our start screen once the game has ended
+            bigScoreEl.innerHTML = score;//this will display our score after the game has ended
         }
 
         projectiles.forEach((projectile, projectileIndex) => {
@@ -224,5 +240,14 @@ addEventListener('click', (event) => {
     projectiles.push(new Projectile(canvas.width / 2, canvas.height / 2, 5, 'white', velocity));    
 }); 
 
-animate();
+startGameBtn.addEventListener('click', () => {
+    init();
+    animate();
+    if(frames % 60 === 0) {
+        spawnEnemies();
+    }   
+    
+    modalEl.style.display = 'none';
+});
+// animate();
 // spawnEnemies();
